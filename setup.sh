@@ -7,6 +7,7 @@
 # Farben für die Ausgabe
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
+RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}>>> Starte MultivanPi Setup...${NC}"
@@ -21,8 +22,19 @@ sudo apt install -y git python3 python3-pip python3-venv python3-full curl build
 
 # 3. Installation der Kiosk-Umgebung (Grafik & Browser)
 echo -e "${GREEN}3. Installiere Kiosk-Komponenten (X11, Openbox, Chromium)...${NC}"
-# Versuche 'chromium' zu installieren (Standard für 64-bit Bookworm)
-sudo apt install -y xserver-xorg x11-xserver-utils xinit openbox chromium unclutter || sudo apt install -y xserver-xorg x11-xserver-utils xinit openbox chromium-browser unclutter
+
+# Suche nach dem verfügbaren Chromium-Paket
+if apt-cache show chromium > /dev/null 2>&1; then
+    CHROME_PKG="chromium"
+elif apt-cache show chromium-browser > /dev/null 2>&1; then
+    CHROME_PKG="chromium-browser"
+else
+    echo -e "${RED}Fehler: Weder 'chromium' noch 'chromium-browser' wurden in den Paketquellen gefunden!${NC}"
+    exit 1
+fi
+
+echo -e "${BLUE}Nutze Paket: $CHROME_PKG${NC}"
+sudo apt install -y xserver-xorg x11-xserver-utils xinit openbox $CHROME_PKG unclutter
 
 # 4. Installation von Node.js (LTS)
 echo -e "${GREEN}4. Installiere Node.js & NPM...${NC}"
