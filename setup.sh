@@ -20,8 +20,8 @@ sudo apt update && sudo apt upgrade -y
 echo -e "${GREEN}2. Installiere Basis-Tools (Git, Python, Pip)...${NC}"
 sudo apt install -y git python3 python3-pip python3-venv python3-full curl build-essential
 
-# 3. Installation der Kiosk-Umgebung (Grafik & Browser)
-echo -e "${GREEN}3. Installiere Kiosk-Komponenten (X11, Openbox, Chromium)...${NC}"
+# 3. Installation der Kiosk-Umgebung (Grafik, Browser & Display-Manager)
+echo -e "${GREEN}3. Installiere Kiosk-Komponenten (X11, Openbox, Chromium, LightDM)...${NC}"
 
 # Suche nach dem verfügbaren Chromium-Paket
 if apt-cache show chromium > /dev/null 2>&1; then
@@ -34,7 +34,8 @@ else
 fi
 
 echo -e "${BLUE}Nutze Paket: $CHROME_PKG${NC}"
-sudo apt install -y xserver-xorg x11-xserver-utils xinit openbox $CHROME_PKG unclutter
+# lightdm wird hinzugefügt, damit raspi-config die Boot-Option "Desktop" akzeptiert
+sudo apt install -y xserver-xorg x11-xserver-utils xinit openbox lightdm $CHROME_PKG unclutter
 
 # 4. Installation von Node.js (LTS)
 echo -e "${GREEN}4. Installiere Node.js & NPM...${NC}"
@@ -77,8 +78,3 @@ if [ -f "scripts/start_kiosk.sh" ]; then
 fi
 
 echo -e "${BLUE}>>> Setup abgeschlossen!${NC}"
-echo -e "Bitte führe jetzt noch ${GREEN}sudo raspi-config${NC} aus, um:"
-echo -e "1. Unter 'Advanced Options' -> 'Wayland' auf 'X11' zu wechseln."
-echo -e "2. Unter 'System Options' -> 'Boot / Auto Login' auf 'Console Autologin' zu stellen."
-echo -e ""
-echo -e "Danach das System mit ${GREEN}sudo reboot${NC} neu starten."
