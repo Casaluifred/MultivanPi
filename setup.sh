@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # MultivanPi Setup Skript
-# Zielsystem: Raspberry Pi OS (Lite)
+# Zielsystem: Raspberry Pi OS (Lite) 64-bit
 # Autor: fred
 
 # Farben für die Ausgabe
@@ -21,7 +21,8 @@ sudo apt install -y git python3 python3-pip python3-venv python3-full curl build
 
 # 3. Installation der Kiosk-Umgebung (Grafik & Browser)
 echo -e "${GREEN}3. Installiere Kiosk-Komponenten (X11, Openbox, Chromium)...${NC}"
-sudo apt install -y xserver-xorg x11-xserver-utils xinit openbox chromium-browser unclutter
+# Versuche 'chromium' zu installieren (Standard für 64-bit Bookworm)
+sudo apt install -y xserver-xorg x11-xserver-utils xinit openbox chromium unclutter || sudo apt install -y xserver-xorg x11-xserver-utils xinit openbox chromium-browser unclutter
 
 # 4. Installation von Node.js (LTS)
 echo -e "${GREEN}4. Installiere Node.js & NPM...${NC}"
@@ -52,14 +53,16 @@ fi
 # 7. Openbox Konfiguration vorbereiten
 echo -e "${GREEN}7. Konfiguriere Autostart...${NC}"
 mkdir -p ~/.config/openbox
-if [ ! -f "~/.config/openbox/autostart" ]; then
+if [ ! -f "$HOME/.config/openbox/autostart" ]; then
     echo "Erstelle neue Openbox Autostart Datei..."
     echo "# MultivanPi Autostart" > ~/.config/openbox/autostart
     echo "exec /home/fred/MultivanPi/scripts/start_kiosk.sh &" >> ~/.config/openbox/autostart
 fi
 
 # 8. Ausführrechte für Skripte sicherstellen
-chmod +x scripts/start_kiosk.sh
+if [ -f "scripts/start_kiosk.sh" ]; then
+    chmod +x scripts/start_kiosk.sh
+fi
 
 echo -e "${BLUE}>>> Setup abgeschlossen!${NC}"
 echo -e "Bitte führe jetzt noch ${GREEN}sudo raspi-config${NC} aus, um:"
