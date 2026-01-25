@@ -9,5 +9,5 @@ xset s noblank
 xset -dpms
 
 # Chromium im Kiosk-Modus starten
-# --window-size und --window-position helfen beim Waveshare Display
-chromium --kiosk --noerrdialogs --disable-infobars --window-size=1440,2560 --window-position=0,0 http://localhost:3000
+# Da wir per xrandr gedreht haben, ist die Auflösung nun 2560x1440
+chromium --kiosk --noerrdialogs --disable-infobars --window-size=2560,1440 --window-position=0,0 http://localhost:3000
