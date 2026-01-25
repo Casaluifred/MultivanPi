@@ -67,7 +67,27 @@ Erstelle oder bearbeite die Datei
  
 /home/fred/MultivanPi/scripts/start_kiosk.sh &
 
-# 6. Troubleshooting
+# 6. Updates & Wartung
+
+Du kannst dein System jederzeit aktualisieren, ohne es neu zu installieren. Wenn du Änderungen auf GitHub hochgeladen hast:
+
+In das Projektverzeichnis wechseln:
+
+cd ~/MultivanPi
+
+
+Den neuesten Stand von GitHub ziehen:
+
+git pull
+
+
+(Optional) Falls du neue Abhängigkeiten oder Pakete im Setup-Skript hinzugefügt hast, führe es einfach erneut aus:
+
+./setup.sh
+
+
+# 7. Troubleshooting
+
 Skript startet nicht? Prüfe, ob du chmod +x setup.sh ausgeführt hast.
 
 Kein Bild? Prüfe in der /boot/firmware/config.txt, ob die dtoverlay-Einträge für das Display korrekt sind.
@@ -76,5 +96,5 @@ Cursor sichtbar? Das Setup-Skript sollte unclutter installieren, um den Mauszeig
 
 Kein Zugriff auf USB/OBD? Überprüfe mit groups, ob der User fred Mitglied in dialout ist.
 
-
 Dokumentation für MultivanPi.
+
