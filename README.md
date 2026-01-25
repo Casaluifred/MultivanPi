@@ -1,4 +1,4 @@
-MultivanPi 🚐💨
+# MultivanPi
 Ein zentrales Kontrollpanel für den VW T4 Multivan Camper auf Basis eines Raspberry Pi 4 und einem 5.5" 2K Touch-Display.
 Features
 Victron Integration: Überwachung von Solar (MPPT), Starterbatterie (SmartShunt) und Versorgerbatterie (LiFePO4) via Bluetooth LE.
