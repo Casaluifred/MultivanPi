@@ -31,7 +31,7 @@ chmod +x setup.sh
 # 4. Finalisierung
 Reboot: sudo reboot
 
-Kiosk-Autostart: Trage /home/fred/multivanpi/scripts/start_kiosk.sh & in die Datei /home/fred/.config/openbox/autostart ein.
+Kiosk-Autostart: Trage /home/[Username]/multivanpi/scripts/start_kiosk.sh & in die Datei /home/[Username]/.config/openbox/autostart ein.
 
 
 Dokumentation für MultivanPi.
