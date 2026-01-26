@@ -1,42 +1,48 @@
 #!/bin/bash
 
-# 1. Sicherstellen, dass die Umgebungsvariable gesetzt ist
+# 1. Umgebungsvariablen setzen
 export DISPLAY=:0
 
-# 2. Kurze Pause, damit der X-Server und die Hardware bereit sind
-sleep 4
+# 2. PROJEKT-VERZEICHNIS
+# Wir wechseln in dein Verzeichnis, damit der Server die index.html findet
+cd /home/fred/MultivanPi
 
-# 3. Monitor-Name auslesen (In deinem Fall: "default")
-# Wir nutzen den Namen, den du mir gerade geschickt hast.
-MONITOR_NAME=$(xrandr | grep " connected" | cut -d' ' -f1)
-
-# Falls die Suche fehlschlägt, erzwingen wir "default"
-if [ -z "$MONITOR_NAME" ]; then
-    MONITOR_NAME="default"
+# 3. WEBSERVER STARTEN (Falls er noch nicht läuft)
+# Wir starten den Python-Server im Hintergrund (&). 
+# 'nohup' und die Umleitung nach /dev/null sorgen dafür, dass er stabil läuft.
+if ! pgrep -f "python3 -m http.server 3000" > /dev/null; then
+    nohup python3 -m http.server 3000 > /dev/null 2>&1 &
+    sleep 2 # Kurze Pause, damit der Server bereit ist
 fi
 
-# 4. Anzeige drehen
-# Da der Treiber "default" heißt, versuchen wir die Rotation direkt
-# Hinweis: Falls 'xrandr' hier einen Fehler wirft, liegt es am fbdev-Treiber.
-# In diesem Fall nutzen wir die Chromium-interne Drehung als Fallback.
-xrandr --output "$MONITOR_NAME" --rotate right || echo "xrandr rotation failed, continuing..."
+# 4. Kurze Pause für die Hardware-Initialisierung
+sleep 4
 
-# 5. Mauszeiger verstecken
+# 5. TOUCH-ROTATION
+TOUCH_DEVICE=$(xinput list --name-only | grep -iE "touch|point|waveshare|hid" | head -n 1)
+if [ -n "$TOUCH_DEVICE" ]; then
+    xinput set-prop "$TOUCH_DEVICE" "Coordinate Transformation Matrix" 0 1 0 -1 0 1 0 0 1
+fi
+
+# 6. Mauszeiger verstecken
 unclutter -idle 0.1 -root &
 
-# 6. Bildschirmschoner und Energiesparmodus aus
+# 7. Bildschirmschoner und Energiesparmodus deaktivieren
 xset s off
 xset s noblank
 xset -dpms
 
-# 7. Chromium starten
-# WICHTIG: Wenn xrandr die Drehung geschafft hat, ist die Auflösung 2560x1440.
-# Wir fügen '--force-device-scale-factor' hinzu, um die Darstellung für das 2K Display zu optimieren.
+# 8. Chromium im Vollbild starten
 chromium --kiosk \
+         --no-first-run \
          --noerrdialogs \
          --disable-infobars \
-         --window-size=2560,1440 \
+         --start-maximized \
+         --window-size=1440,2560 \
          --window-position=0,0 \
-         --force-device-scale-factor=1.2 \
+         --force-device-scale-factor=1.0 \
          --ignore-certificate-errors \
+         --disable-restore-session-state \
+         --ozone-platform=x11 \
+         --user-data-dir=/home/fred/.config/chromium-kiosk \
          http://localhost:3000
