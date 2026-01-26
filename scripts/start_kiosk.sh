@@ -4,15 +4,13 @@
 export DISPLAY=:0
 
 # 2. PROJEKT-VERZEICHNIS
-# Wir wechseln in dein Verzeichnis, damit der Server die index.html findet
 cd /home/fred/MultivanPi
 
-# 3. WEBSERVER STARTEN (Falls er noch nicht läuft)
-# Wir starten den Python-Server im Hintergrund (&). 
-# 'nohup' und die Umleitung nach /dev/null sorgen dafür, dass er stabil läuft.
-if ! pgrep -f "python3 -m http.server 3000" > /dev/null; then
-    nohup python3 -m http.server 3000 > /dev/null 2>&1 &
-    sleep 2 # Kurze Pause, damit der Server bereit ist
+# 3. WEBSERVER & VICTRON SERVICE STARTEN
+# WICHTIG: Wir nutzen jetzt das Python aus der virtuellen Umgebung (venv)
+if ! pgrep -f "backend/victron_service.py" > /dev/null; then
+    nohup /home/fred/MultivanPi/venv/bin/python3 backend/victron_service.py > /dev/null 2>&1 &
+    sleep 4
 fi
 
 # 4. Kurze Pause für die Hardware-Initialisierung
