@@ -54,14 +54,14 @@ DEVICE_CONFIG = {
         "key": "KEY_SHUNT_STARTER",
         "type": "shunt_starter"
     },
-    "MAC_MPPT": {
+    "E1:B5:C7:D7:9F:36": {
         "name": "SmartSolar MPPT",
-        "key": "KEY_MPPT",
+        "key": "e2b509b595c2854127b4050f791c2d71",
         "type": "mppt"
     },
-    "MAC_BOOSTER": {
+    "D7:CA:C9:74:A7:97": {
         "name": "Ladebooster",
-        "key": "KEY_BOOSTER",
+        "key": "bee5991f9298392b75bf7c8a3677fa4d",
         "type": "booster" 
     }
 }
