@@ -1,13 +1,8 @@
 #!/bin/bash
-
-# Mauszeiger verstecken
-unclutter -idle 0.1 -root &
-
-# Bildschirmschoner und Energiesparmodus deaktivieren
-xset s off
-xset s noblank
-xset -dpms
-
-# Chromium im Kiosk-Modus starten
-# --window-size und --window-position helfen beim Waveshare Display
-chromium --kiosk --noerrdialogs --disable-infobars --window-size=1440,2560 --window-position=0,0 http://localhost:3000
+export DISPLAY=:0
+export XAUTHORITY=/home/fred/.Xauthority
+PROJECT_DIR="/home/fred/MultivanPi"
+sudo fuser -k 3000/tcp > /dev/null 2>&1
+sudo $PROJECT_DIR/venv/bin/python3 $PROJECT_DIR/backend/victron_service.py &
+sleep 5
+chromium-browser --kiosk --incognito --noerrdialogs --disable-infobars --window-size=1440,2560 "http://127.0.0.1:3000" &

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MultivanPi Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <script src="/static/lucide.min.js"></script>
+    <script src="/static/chart.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #000000; --card-bg: rgba(25, 25, 25, 0.95); --accent-color: #00d4ff;
+            --text-color: #ffffff; --success-color: #44ff44; --warning-color: #ffcc00;
+            --danger-color: #ff4444; --level-liquid: rgba(202, 255, 66, 0.15); 
+            --level-border: rgba(202, 255, 66, 0.4); --level-bubble-core: rgba(202, 255, 66, 0.9);
+        }
+        body {
+            margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color);
+            font-family: 'Inter', sans-serif; overflow: hidden;
+            width: 2560px; height: 1440px; transform: rotate(90deg); transform-origin: top left;
+            position: absolute; top: 0; left: 1440px; display: flex; flex-direction: column;
+        }
+        .header { padding: 60px 100px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .header h2 { font-size: 4rem; margin: 0; font-weight: 700; }
+        #clock { font-size: 4rem; font-weight: 300; }
+        .view-container { flex-grow: 1; padding: 60px 100px; position: relative; }
+        .view { display: none; width: 100%; height: 100%; animation: fadeIn 0.3s ease; }
+        .view.active { display: flex; flex-direction: column; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 50px; height: 100%; }
+        .card { background: var(--card-bg); border-radius: 50px; padding: 40px; border: 4px solid var(--accent-color); transition: all 0.2s ease; cursor: pointer; text-align: center; }
+        .card-layout { height: 100%; display: grid; grid-template-rows: 1fr auto 1fr; align-items: center; justify-items: center; }
+        .large-icon { width: 180px !important; height: 180px !important; }
+        .card-label { font-size: 2.2rem; opacity: 0.5; text-transform: uppercase; letter-spacing: 4px; }
+        .val-home { font-size: 7rem; font-weight: 800; }
+        .unit { font-size: 3rem; opacity: 0.3; margin-left: 10px; }
+        .border-connected { border: 3px solid rgba(68, 255, 68, 0.4) !important; }
+        .border-disconnected { border: 3px solid rgba(255, 204, 0, 0.5) !important; }
+        .home-btn { position: fixed; bottom: 80px; right: 80px; width: 240px; height: 240px; background: var(--card-bg); border: 5px solid var(--accent-color); border-radius: 60px; display: none; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; opacity: 0.7; }
+        .home-btn svg { width: 192px !important; height: 192px !important; color: #fff; }
+        .level-bar-container { background: #1e1e1e; border-radius: 40px; padding: 40px; margin-bottom: 40px; position: relative; border: 2px solid rgba(255,255,255,0.1); }
+        .spirit-level { width: 80%; height: 140px; background: var(--level-liquid); border-radius: 70px; position: relative; overflow: hidden; border: 4px solid var(--level-border); }
+        .bubble { width: 160px; height: 90px; background: radial-gradient(circle at 30% 30%, #fff, var(--level-bubble-core)); border-radius: 50px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: left 0.2s ease-out; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div><h2>MULTIVAN<span style="color: var(--accent-color);">PI</span></h2></div>
+        <div id="clock">00:00</div>
+    </div>
+    <div class="view-container">
+        <section id="view-home" class="view active">
+            <div class="grid">
+                <div class="card" id="card-energy" onclick="showView('victron')"><div class="card-layout"><div class="icon-box"><i data-lucide="zap" class="large-icon"></i></div><div class="card-label">Energie</div><div id="home-soc" class="val-home">--<span class="unit">%</span></div></div></div>
+                <div class="card" onclick="showView('klima')"><div class="card-layout"><div class="icon-box"><i data-lucide="thermometer" class="large-icon"></i></div><div class="card-label">Klima</div><div id="home-temp" class="val-home">--<span class="unit">°C</span></div></div></div>
+                <div class="card" onclick="showView('level')"><div class="card-layout"><div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="large-icon"><rect x="1" y="8" width="22" height="8" rx="4" /><line x1="7" y1="8" x2="7" y2="16" /><line x1="17" y1="8" x2="17" y2="16" /><circle cx="12" cy="12" r="2" /></svg></div><div class="card-label">Ausrichten</div></div></div>
+                <div class="card" onclick="location.reload()"><div class="card-layout"><div class="icon-box"><i data-lucide="refresh-cw" class="large-icon"></i></div><div class="card-label">System</div><div class="val-home">v2.4</div></div></div>
+            </div>
+        </section>
+        <section id="view-victron" class="view">
+            <div class="grid">
+                <div id="card-vic-shunt" class="card"><div class="card-label">Aufbau</div><div id="vic-soc" class="val-home">--%</div><div id="vic-shunt-status">Suche...</div></div>
+                <div id="card-vic-solar" class="card"><div class="card-label">Solar</div><div id="vic-solar" class="val-home">--W</div><div id="vic-solar-status">Suche...</div></div>
+                <div id="card-vic-booster" class="card"><div class="card-label">Booster</div><div id="vic-booster" class="val-home">--A</div><div id="vic-booster-status">Suche...</div></div>
+                <div id="card-vic-sense" class="card"><div class="card-label">Sense</div><div id="vic-sense" class="val-home">--°C</div><div id="vic-sense-status">Suche...</div></div>
+            </div>
+        </section>
+        <section id="view-level" class="view">
+            <div class="level-bar-container"><div class="card-label">Quer (Roll)</div><div class="spirit-level"><div id="bubble-roll" class="bubble"></div></div><div id="disp-roll" class="val-home">0.0°</div></div>
+            <div class="level-bar-container"><div class="card-label">Längs (Pitch)</div><div class="spirit-level"><div id="bubble-pitch" class="bubble"></div></div><div id="disp-pitch" class="val-home">0.0°</div></div>
+        </section>
+    </div>
+    <div id="btn-home" class="home-btn" onclick="showView('home')"><i data-lucide="home"></i></div>
+    <script>
+        function showView(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById('view-' + id).classList.add('active');
+            document.getElementById('btn-home').style.display = (id === 'home') ? 'none' : 'flex';
+            lucide.createIcons();
+        }
+        function updateStatus(id, last) {
+            const el = document.getElementById(id); if (!el) return;
+            if (last && last !== "Suche...") { el.classList.add('border-connected'); el.classList.remove('border-disconnected'); }
+            else { el.classList.add('border-disconnected'); el.classList.remove('border-connected'); }
+        }
+        async function fetchData() {
+            try {
+                const res = await fetch('/api/data'); const data = await res.json();
+                document.getElementById('clock').innerText = data.server_time;
+                document.getElementById('home-soc').innerHTML = data.aufbau_soc.toFixed(1) + '<span class="unit">%</span>';
+                updateStatus('card-vic-shunt', data.shunt_aufbau_last);
+                updateStatus('card-vic-solar', data.solar_last);
+                updateStatus('card-vic-booster', data.booster_last);
+                updateStatus('card-vic-sense', data.sense_last);
+                document.getElementById('bubble-roll').style.left = (50 + (data.level_roll * 4)) + "%";
+                document.getElementById('bubble-pitch').style.left = (50 + (data.level_pitch * 4)) + "%";
+                document.getElementById('disp-roll').innerText = data.level_roll.toFixed(1) + "°";
+                document.getElementById('disp-pitch').innerText = data.level_pitch.toFixed(1) + "°";
+            } catch(e) {}
+        }
+        setInterval(fetchData, 1000);
+        window.onload = () => { lucide.createIcons(); fetchData(); }
+    </script>
+</body>
+</html>

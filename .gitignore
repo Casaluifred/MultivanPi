@@ -1,32 +1,13 @@
-Node.js
-
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.env
-build/
-dist/
-
-Python
-
-pycache/
+# Python
+venv/
+__pycache__/
 *.py[cod]
 *$py.class
-venv/
-.venv/
-env/
 
-System / IDE
+# Sensible Daten
+backend/config.json
+backend/calibration.json
+backend/pressure_history.json
 
-.DS_Store
-.vscode/
-.idea/
-*.swp
-*.bak
-
-Projekt-Spezifisch (Sensible Daten & Configs)
-
-keys.json
-backend/config/secret.json
-*.local
+# Logs
+service.log
