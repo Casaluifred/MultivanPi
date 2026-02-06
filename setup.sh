@@ -1,80 +1,50 @@
 #!/bin/bash
 
-# MultivanPi Setup Skript
-# Zielsystem: Raspberry Pi OS (Lite) 64-bit
-# Autor: fred
-
 # Farben für die Ausgabe
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
-RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}>>> Starte MultivanPi Setup...${NC}"
+echo -e "${BLUE}>>> MultivanPi: Starte automatische Installation${NC}"
 
-# 1. System Update
-echo -e "${GREEN}1. Aktualisiere Systempakete...${NC}"
-sudo apt update && sudo apt upgrade -y
+# 1. System-Updates & Abhängigkeiten
+echo -e "${GREEN}1. Installiere System-Abhängigkeiten...${NC}"
+sudo apt update
+sudo apt install -y python3-venv python3-pip chromium-browser xserver-xorg xinit openbox unclutter curl fuser bluetooth bluez
 
-# 2. Installation der Basis-Abhängigkeiten
-echo -e "${GREEN}2. Installiere Basis-Tools (Git, Python, Pip)...${NC}"
-sudo apt install -y git python3 python3-pip python3-venv python3-full curl build-essential
+# 2. Python Virtual Environment
+echo -e "${GREEN}2. Erstelle Virtual Environment...${NC}"
+python3 -m venv /home/fred/MultivanPi/venv
+source /home/fred/MultivanPi/venv/bin/activate
 
-# 3. Installation der Kiosk-Umgebung (Grafik, Browser & Display-Manager)
-echo -e "${GREEN}3. Installiere Kiosk-Komponenten (X11, Openbox, Chromium, LightDM)...${NC}"
-
-# Suche nach dem verfügbaren Chromium-Paket
-if apt-cache show chromium > /dev/null 2>&1; then
-    CHROME_PKG="chromium"
-elif apt-cache show chromium-browser > /dev/null 2>&1; then
-    CHROME_PKG="chromium-browser"
+# 3. Python Module installieren
+echo -e "${GREEN}3. Installiere Python-Module...${NC}"
+pip install --upgrade pip
+if [ -f "requirements.txt" ]; then
+    pip install -r requirements.txt
 else
-    echo -e "${RED}Fehler: Weder 'chromium' noch 'chromium-browser' wurden in den Paketquellen gefunden!${NC}"
-    exit 1
+    pip install aiohttp victron-ble
 fi
 
-echo -e "${BLUE}Nutze Paket: $CHROME_PKG${NC}"
-# lightdm wird hinzugefügt, damit raspi-config die Boot-Option "Desktop" akzeptiert
-sudo apt install -y xserver-xorg x11-xserver-utils xinit openbox lightdm $CHROME_PKG unclutter
-
-# 4. Installation von Node.js (LTS)
-echo -e "${GREEN}4. Installiere Node.js & NPM...${NC}"
-if ! command -v node &> /dev/null; then
-    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-    sudo apt install -y nodejs
-else
-    echo "Node.js ist bereits installiert."
-fi
-
-# 5. Benutzer-Berechtigungen setzen (OBD-II & Sensoren)
-echo -e "${GREEN}5. Setze Berechtigungen für User 'fred'...${NC}"
-sudo usermod -aG dialout,gpio $USER
-echo "Berechtigungen für dialout und gpio hinzugefügt."
-
-# 6. Projekt-Struktur & Python Virtual Environment
-echo -e "${GREEN}6. Bereite Python-Umgebung vor...${NC}"
-if [ ! -d "venv" ]; then
-    python3 -m venv venv
-    source venv/bin/activate
-    # Falls eine requirements.txt existiert:
-    if [ -f "requirements.txt" ]; then
-        pip install -r requirements.txt
-    fi
-    deactivate
-fi
-
-# 7. Openbox Konfiguration vorbereiten
-echo -e "${GREEN}7. Konfiguriere Autostart...${NC}"
+# 4. Verzeichnisse prüfen
+echo -e "${GREEN}4. Prüfe Verzeichnisstruktur...${NC}"
 mkdir -p ~/.config/openbox
-if [ ! -f "$HOME/.config/openbox/autostart" ]; then
-    echo "Erstelle neue Openbox Autostart Datei..."
-    echo "# MultivanPi Autostart" > ~/.config/openbox/autostart
-    echo "exec /home/fred/MultivanPi/scripts/start_kiosk.sh &" >> ~/.config/openbox/autostart
+mkdir -p scripts
+mkdir -p backend
+
+# 5. Berechtigungen setzen
+echo -e "${GREEN}5. Setze Berechtigungen...${NC}"
+chmod +x scripts/start_kiosk.sh
+
+# 6. Autostart Konfiguration
+echo -e "${GREEN}6. Konfiguriere Autostart (Openbox)...${NC}"
+echo "/home/fred/MultivanPi/scripts/start_kiosk.sh &" > ~/.config/openbox/autostart
+
+# 7. X11 Initialisierung
+if [ ! -f "~/.xinitrc" ]; then
+    echo "exec openbox-session" > ~/.xinitrc
 fi
 
-# 8. Ausführrechte für Skripte sicherstellen
-if [ -f "scripts/start_kiosk.sh" ]; then
-    chmod +x scripts/start_kiosk.sh
-fi
-
-echo -e "${BLUE}>>> Setup abgeschlossen!${NC}"
+echo -e "${BLUE}>>> Installation abgeschlossen!${NC}"
+echo "Bitte konfiguriere nun deine Victron-Keys in backend/victron_service.py"
+echo "Danach kannst du das System mit 'sudo reboot' neu starten."

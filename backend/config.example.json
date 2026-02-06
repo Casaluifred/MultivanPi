@@ -1,0 +1,24 @@
+{
+    "victron": {
+        "MAC_ADRESSE_HIER_EINTRAGEN": {
+            "name": "Beispiel Gerät (z.B. SmartShunt)",
+            "key": "32_STELLIGER_KEY_HIER",
+            "type": "shunt_aufbau"
+        },
+        "WEITERE_MAC_ADRESSE": {
+            "name": "Beispiel Solar",
+            "key": "32_STELLIGER_KEY_HIER",
+            "type": "mppt"
+        },
+       "AA:BB:CC:DD:EE:FF": {
+            "name": "Ladebooster",
+            "key": "7zU8nB2aX5cY9vR1qW4mK3jL6oP0sTfD",
+            "type": "booster"
+        }
+    },
+    "ecoflow": {
+        "sn": "DEINE_SERIENNUMMER",
+        "access_key": "DEIN_ACCESS_KEY",
+        "secret_key": "DEIN_SECRET_KEY"
+    }
+}
