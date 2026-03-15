@@ -42,4 +42,5 @@ So findest du die richtigen Pfade für deine Powerstation:
         self.dp_remain_dsg = "ecoflow-mqtt.1.P351...DEINE_ID...bmsDsgRemTime"
         self.dp_remain_chg = "ecoflow-mqtt.1.P351...DEINE_ID...bmsChgRemTime"
 
+```
 © 2024-2026 Fred Fiedler
