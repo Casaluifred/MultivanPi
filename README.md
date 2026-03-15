@@ -4,7 +4,7 @@ Zentrales Dashboard für den VW Multivan zur Überwachung von Victron Energiedat
 
 ## Hardware & Anschlüsse
 - **BME280**: I2C (GPIO 2/3) - Innenklima & Druck
-- **ADXL345**: I2C (GPIO 2/3) - Wasserwaage
+- **ADXL345**: I2C (GPIO 2/3) - Wasserwaage; akternativ: **GY-BN0055** I2C (GPIO 2/3) liefert stabilere Daten
 - **DS18B20**: 1-Wire (GPIO 4) - Außentemperatur (4.7k Pull-Up benötigt)
 - **DS3231**: I2C (GPIO 2/3) - Echtzeituhr
 
