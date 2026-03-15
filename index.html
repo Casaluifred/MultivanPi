@@ -12,8 +12,7 @@
     <script>if (!window.Chart) document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>');</script>
 
     <script>
-        // --- VERSION ---
-        const FRONT_VERSION = "3.2";
+        const FRONT_VERSION = "4.8";
     </script>
 
     <style>
@@ -26,16 +25,11 @@
             --warning-color: #ffcc00;
             --danger-color: #ff4444;
             --usb-color: #ff9900;
-            --level-liquid: rgba(202, 255, 66, 0.15); 
-            --level-border: rgba(202, 255, 66, 0.4);
-            --level-bubble-core: rgba(202, 255, 66, 0.9);
-            
             --font-header: 4rem;      
             --font-clock: 4rem;
             --font-date: 2rem;        
         }
 
-        /* ROTATION BEIBEHALTEN */
         body {
             margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color);
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -73,6 +67,7 @@
         }
         .card:active { transform: scale(0.98); background: rgba(40,40,40,0.95); }
         .card.warning-border { border-color: var(--warning-color) !important; box-shadow: 0 0 30px rgba(255, 204, 0, 0.2); }
+        .danger-border { border-color: var(--danger-color) !important; box-shadow: 0 0 30px rgba(255, 68, 68, 0.2) !important; }        
         
         .card-layout { height: 100%; width: 100%; display: grid; grid-template-rows: 1fr auto 1fr; align-items: center; justify-items: center; }
         .icon-box { height: 100%; width: 100%; display: flex; align-items: center; justify-content: center; margin: 0; }
@@ -83,17 +78,15 @@
         .unit-large { font-size: 1em; opacity: 1; margin-left: 5px; font-weight: 700; }
         .small-label { font-size: 1.5rem; opacity: 0.5; margin-top: 5px; }
 
-        /* ECOFLOW & SWITCHES */
         .eco-grid { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 40px; align-items: center; flex-grow: 1; margin-bottom: 20px; }
         .eco-circle-container { position: relative; width: 420px; height: 420px; margin: 0 auto; border-radius: 50%; border: 15px solid rgba(68, 255, 68, 0.25); display: flex; flex-direction: column; justify-content: center; align-items: center; transition: all 0.5s ease; }
         .eco-circle-container.low-soc { border-color: rgba(255, 153, 0, 0.4); }
         .eco-circle-value { font-size: 10rem; font-weight: 900; line-height: 1; }
-        .eco-circle-label { font-size: 2rem; opacity: 0.6; margin-top: 10px; }
+        .eco-circle-label { font-size: 2.2rem; opacity: 0.9; color: #fff; font-weight: 700; margin-top: 10px; }
         .eco-data-box { text-align: center; padding: 40px; background: rgba(255,255,255,0.05); border-radius: 40px; border: 3px solid rgba(255,255,255,0.15); display: flex; flex-direction: column; justify-content: center; }
 
         .switch-container { display: flex; gap: 120px; justify-content: center; width: 100%; margin-bottom: 80px; }
         .switch-btn { width: 480px; height: 240px; border-radius: 60px; font-size: 2.5rem; font-weight: 800; cursor: pointer; background: rgba(255,255,255,0.05); border: 4px solid var(--accent-color); color: #aaa; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
-        .switch-btn svg { width: 80px !important; height: 80px !important; }
         .switch-btn.active-ac { background: var(--success-color); color: #000; border-color: var(--success-color); box-shadow: 0 0 40px rgba(68, 255, 68, 0.3); }
         .switch-btn.active-dc { background: var(--accent-color); color: #000; border-color: var(--accent-color); box-shadow: 0 0 40px rgba(0, 212, 255, 0.3); }
         .switch-btn.active-usb { background: var(--usb-color); color: #000; border-color: var(--usb-color); box-shadow: 0 0 40px rgba(255, 153, 0, 0.3); }
@@ -110,9 +103,6 @@
 
         .home-btn { position: fixed; bottom: 80px; right: 80px; width: 240px; height: 240px; background: var(--card-bg); border: 5px solid var(--accent-color); border-radius: 60px; display: none; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; opacity: 0.7; }
         .home-btn svg { width: 192px !important; height: 192px !important; stroke-width: 1.2; color: #ffffff !important; }
-        
-        .back-btn { position: absolute; top: 40px; right: 40px; width: 120px; height: 120px; background: rgba(255,255,255,0.05); border: 2px solid var(--accent-color); border-radius: 30px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .back-btn svg { width: 60px !important; height: 60px !important; color: var(--accent-color); }
         
         .chart-back-btn { position: fixed; top: 220px; right: 100px; width: 240px; height: 240px; background: var(--card-bg); border: 5px solid var(--accent-color); border-radius: 60px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; opacity: 0.8; }
         .chart-back-btn svg { width: 192px !important; height: 192px !important; color: #ffffff; }
@@ -140,7 +130,6 @@
 
         .chart-container { flex: 1; min-height: 0; width: 100%; background: #444444; border-radius: 50px; padding: 30px; padding-bottom: 40px; border: 2px solid rgba(255,255,255,0.1); margin-top: 20px; margin-bottom: 80px; position: relative; box-shadow: inset 0 0 50px rgba(0,0,0,0.5); }
 
-        /* MODALS */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
         .modal-content { background: var(--card-bg); border: 4px solid var(--accent-color); padding: 80px; border-radius: 60px; text-align: center; width: 70%; max-width: 1400px; box-shadow: 0 0 100px rgba(0, 212, 255, 0.3); }
         .modal-content h3 { font-size: 5rem; margin: 0 0 40px 0; font-weight: 900; }
@@ -153,7 +142,6 @@
         .btn-danger { background: var(--danger-color); color: #fff; box-shadow: 0 0 30px rgba(255, 68, 68, 0.4); border: none; }
         #press-trend-icon { width: 50px; height: 50px; vertical-align: middle; margin-left: 10px; color: var(--accent-color); }
 
-        /* INFO VIEW */
         .info-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
         .info-title { font-size: 6rem; font-weight: 900; margin-bottom: 20px; letter-spacing: 3px; }
         .info-subtitle { font-size: 2.5rem; opacity: 0.5; margin-bottom: 80px; }
@@ -162,7 +150,6 @@
         .info-box h4 { font-size: 2rem; opacity: 0.6; margin: 0 0 20px 0; text-transform: uppercase; }
         .info-box div { font-size: 3rem; font-weight: 700; }
         
-        /* NEU: Split-Box Style für Info */
         .info-split-row { display: flex; justify-content: space-between; align-items: flex-end; }
         .info-split-item { display: flex; flex-direction: column; }
         .info-split-label { font-size: 1.5rem; color: #aaa; text-transform: uppercase; margin-bottom: 5px; }
@@ -170,19 +157,45 @@
         .wifi-ok { color: var(--accent-color); }
         .wifi-no { color: #555; }
 
-        /* NIVELIERUNG VIEW */
-        .level-grid { display: grid; grid-template-rows: 1fr 1fr; gap: 40px; height: 85%; }
-        .level-bar-container { background: rgba(30, 30, 30, 1); border-radius: 40px; padding: 40px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 2px solid rgba(255,255,255,0.1); position: relative; }
-        .level-label { position: absolute; top: 40px; left: 60px; font-size: 2.5rem; font-weight: 700; opacity: 0.6; text-transform: uppercase; }
-        .level-value-display { position: absolute; top: 40px; right: 60px; font-size: 3rem; font-weight: 700; color: var(--accent-color); }
-        .spirit-level { width: 80%; height: 140px; background: var(--level-liquid); border-radius: 70px; position: relative; overflow: hidden; box-shadow: inset 0 5px 20px rgba(0,0,0,0.5); border: 4px solid var(--level-border); }
-        .spirit-center-marker { position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: rgba(255,255,255,0.3); transform: translateX(-50%); z-index: 10; }
-        .spirit-center-zone { position: absolute; left: 50%; top: 0; bottom: 0; width: 140px; background: transparent; transform: translateX(-50%); border-left: 3px solid rgba(255,255,255,0.3); border-right: 3px solid rgba(255,255,255,0.3); z-index: 5; }
-        .bubble { width: 160px; height: 90px; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), var(--level-bubble-core)); border-radius: 50px; position: absolute; top: 50%; left: 50%; margin-top: -45px; transform: translateX(-50%); transition: transform 0.2s ease-out; box-shadow: 0 4px 15px rgba(0,0,0,0.4), inset 0 -5px 10px rgba(0,0,0,0.1); border: 2px solid rgba(255,255,255,0.5); z-index: 8; }
+        .car-level-container { display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; position: relative; flex-grow: 1; }
+        .car-image-wrapper { position: relative; width: 1200px; max-width: 90%; }
+        .car-image-wrapper img { width: 100%; height: auto; display: block; }
+        .wheel-badge { position: absolute; padding: 20px 30px; font-size: 3.5rem; font-weight: 800; color: #fff; border-radius: 30px; transform: translate(-50%, -50%); transition: all 0.3s ease; text-align: center; min-width: 120px; z-index: 10; background: var(--card-bg); }
+        .wheel-badge.zero-lift { border-color: var(--success-color); box-shadow: 0 0 40px rgba(68, 255, 68, 0.4); color: var(--success-color); }
         .level-cal-btn { position: absolute; bottom: 80px; left: 100px; padding: 30px 60px; font-size: 2rem; border-radius: 30px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); color: white; cursor: pointer; }
+
+        #wake-shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: rgba(0,0,0,0.01); display: none; }
+
+        /* --- POWERQUEEN CSS ANIMATION --- */
+        .pq-liquid-container {
+            position: relative; width: 450px; height: 450px; border-radius: 50%;
+            border: 12px solid var(--accent-color); overflow: hidden; background: rgba(0,0,0,0.4);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.15) inset, 0 0 30px rgba(0, 212, 255, 0.2);
+        }
+        .pq-liquid-wave {
+            position: absolute; width: 1000px; height: 1000px; left: 50%; margin-left: -500px;
+            background: rgba(68, 255, 68, 0.4);
+            border-radius: 40%;
+            animation: pq-spin 7s linear infinite;
+            transition: top 1.5s ease, background 1.5s ease;
+            z-index: 1;
+        }
+        .pq-liquid-wave:nth-child(2) {
+            background: rgba(68, 255, 68, 0.8);
+            border-radius: 45%;
+            animation: pq-spin 11s linear infinite;
+        }
+        @keyframes pq-spin { 100% { transform: rotate(360deg); } }
+        .pq-soc-display { 
+            position: relative; z-index: 10; font-size: 11rem; font-weight: 900; 
+            text-shadow: 0 5px 25px rgba(0,0,0,0.9); letter-spacing: -2px;
+        }
     </style>
 </head>
 <body>
+
+    <div id="wake-shield"></div>
 
     <div class="header">
         <div>
@@ -206,7 +219,7 @@
                     </div>
                 </div>
                 
-                <div class="card" onclick="showView('klima')">
+                <div class="card" id="card-klima" onclick="showView('klima')">
                     <div class="card-layout">
                         <div class="icon-box"><i data-lucide="thermometer" class="large-icon"></i></div>
                         <div class="card-label">Klima</div>
@@ -214,9 +227,9 @@
                     </div>
                 </div>
                 
-                <div class="card" onclick="showView('level')">
-                    <div class="card-layout">
-                        <div class="icon-box">
+                <div class="card" style="padding: 0;" onclick="showView('level')">
+                    <div style="display: flex; flex-direction: column; height: 100%; width: 100%;">
+                        <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="large-icon">
                                <rect x="1" y="8" width="22" height="8" rx="4" />
                               <line x1="7" y1="8" x2="7" y2="16" />
@@ -224,9 +237,11 @@
                                   <circle cx="12" cy="12" r="2" />
                             </svg>
                         </div>
-                        <div class="card-label">Ausrichten</div>
-                        <div style="width: 100%; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 10px;">
-                            <div id="btn-ecoflow-home" class="ecoflow-btn offline" onclick="event.stopPropagation(); showView('ecoflow')">
+                        <div style="display: flex; justify-content: center; align-items: center; padding: 5px 0; border-top: 1px solid transparent; border-bottom: 1px solid transparent;">
+                            <div class="card-label" style="margin: 0;">Ausrichten</div>
+                        </div>
+                        <div style="flex: 1; display: flex; justify-content: center; align-items: center; width: 100%;">
+                            <div id="btn-ecoflow-home" class="ecoflow-btn offline" style="margin: 0;" onclick="event.stopPropagation(); showView('ecoflow')">
                                 <i data-lucide="package" style="width: 80px; height: 80px;"></i>
                                 <div class="ecoflow-btn-text">ECOFLOW</div>
                             </div>
@@ -240,12 +255,14 @@
                             <i data-lucide="power" class="split-btn-icon" style="opacity: 0.3; color: white;"></i>
                             <div class="split-btn-label" style="opacity: 0.5; color: white;">AUSSCHALTEN</div>
                         </div>
-                        <div style="display: flex; justify-content: center; align-items: center; padding: 5px 0;">
+                        <div style="display: flex; justify-content: center; align-items: center; padding: 5px 0; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1);">
                              <div class="card-label" style="margin: 0;">System</div>
                         </div>
-                        <div class="split-btn" onclick="location.reload()">
-                            <i data-lucide="refresh-cw" class="split-btn-icon" style="color: var(--accent-color);"></i>
-                            <div class="split-btn-label" style="color: var(--accent-color);">REFRESH</div>
+                        <div style="flex: 1; display: flex; justify-content: center; align-items: center; width: 100%;">
+                            <div class="ecoflow-btn" style="margin: 0;" onclick="showView('powerqueen')">
+                                <i data-lucide="battery-charging" style="width: 80px; height: 80px;"></i>
+                                <div class="ecoflow-btn-text">LiFePO4</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -275,9 +292,10 @@
                     </div>
                     <div class="small-label" style="color: var(--accent-color);">KLICKEN FÜR DIAGRAMM</div>
                 </div>
-                <div class="detail-card">
-                    <div><i data-lucide="snowflake" class="mid-icon"></i><div class="card-label">Kühlbox</div></div>
+                <div class="detail-card xtramp-box" onclick="showView('fridge')" style="cursor: pointer;">
+                    <div><i data-lucide="snowflake" class="mid-icon" color="#00d4ff"></i><div class="card-label">Kühlbox</div></div>
                     <div id="clim-fridge" class="val-mid">--<span class="unit">°C</span></div>
+                    <div class="small-label" style="color: var(--accent-color);">KLICKEN FÜR STEUERUNG</div>
                 </div>
                 <div class="detail-card">
                     <div><i data-lucide="thermometer-snowflake" class="mid-icon"></i><div class="card-label">LiFePO4</div></div>
@@ -294,20 +312,92 @@
             <div class="chart-back-btn" onclick="showView('klima')"><i data-lucide="arrow-left"></i></div>
         </section>
 
+        <section id="view-fridge" class="view">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                <div><h1 style="font-size: 5rem; margin: 0; color: var(--accent-color);">Kühlbox Steuerung</h1><p style="font-size: 2rem; opacity: 0.5;">Vevor / Alpicool Kompressorkühlbox</p></div>
+            </div>
+            
+            <div class="subview-grid">
+                <div class="detail-card xtramp-box" style="grid-row: span 2; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div class="card-label">Ist-Temperatur</div>
+                        <div id="fridge-menu-ist" style="font-size: 10rem; font-weight: 900; color: var(--accent-color); line-height: 1;">--<span class="unit" style="font-size: 4rem;">°C</span></div>
+                    </div>
+                    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                        <div>
+                            <div class="small-label">Soll</div>
+                            <div id="fridge-menu-soll" class="val-mid">--<span class="unit">°C</span></div>
+                        </div>
+                        <div>
+                            <div class="small-label">Bordnetz</div>
+                            <div id="fridge-menu-volt" class="val-mid">--<span class="unit">V</span></div>
+                        </div>
+                        <div onclick="toggleFridgeProtection()" style="cursor: pointer; background: rgba(0,212,255,0.05); border-radius: 20px; padding-left: 10px;">
+                            <div class="small-label">Schutz</div>
+                            <div id="fridge-menu-prot" class="val-mid" style="color: var(--accent-color);">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-card" style="display: flex; justify-content: center; align-items: center; cursor: pointer; border: 3px solid rgba(255,255,255,0.1);" onclick="setFridgeTemp('plus')">
+                    <i data-lucide="plus" style="width: 100px; height: 100px; color: var(--accent-color);"></i>
+                </div>
+                
+                <div class="detail-card" id="btn-fridge-mode" style="display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; border: 3px solid rgba(255,255,255,0.1);" onclick="toggleFridgeMode()">
+                    <i data-lucide="leaf" style="width: 80px; height: 80px; color: #44ff44; margin-bottom: 15px;" id="icon-fridge-mode"></i>
+                    <div class="card-label" id="text-fridge-mode">ECO Modus</div>
+                </div>
+
+                <div class="detail-card" style="display: flex; justify-content: center; align-items: center; cursor: pointer; border: 3px solid rgba(255,255,255,0.1);" onclick="setFridgeTemp('minus')">
+                    <i data-lucide="minus" style="width: 100px; height: 100px; color: var(--accent-color);"></i>
+                </div>
+                
+                <div class="detail-card" id="btn-fridge-power" style="display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; border: 3px solid rgba(255,255,255,0.1);" onclick="toggleFridgePower()">
+                    <i data-lucide="power" style="width: 80px; height: 80px; color: var(--success-color); margin-bottom: 15px;" id="icon-fridge-power"></i>
+                    <div class="card-label" id="text-fridge-power">Power ON</div>
+                </div>
+            </div>
+            
+            <div class="chart-back-btn" onclick="showView('klima')"><i data-lucide="arrow-left"></i></div>
+        </section>
+        
+        <section id="view-powerqueen" class="view">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                <div>
+                    <h1 style="font-size: 5rem; margin: 0; color: var(--accent-color); font-weight: 900; letter-spacing: 2px;">POWER QUEEN</h1>
+                    <p style="font-size: 2rem; opacity: 0.5;">Batterie-Management-System (BMS)</p>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 60px; height: 700px; margin-top: 40px;">
+                <div class="detail-card xtramp-box" style="display: flex; align-items: center; justify-content: center;">
+                    <div class="pq-liquid-container">
+                        <div class="pq-liquid-wave" id="pq-wave-1" style="top: 50%;"></div>
+                        <div class="pq-liquid-wave" id="pq-wave-2" style="top: 50%;"></div>
+                        <div id="pq-view-soc" class="pq-soc-display">--<span class="unit" style="font-size: 6rem; opacity: 0.9; color: #fff;">%</span></div>
+                    </div>
+                </div>
+
+                <div class="detail-card" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <i data-lucide="thermometer-snowflake" style="width: 120px; height: 120px; color: var(--accent-color); margin-bottom: 40px; opacity: 0.8;"></i>
+                    <div class="card-label" style="font-size: 2.5rem; margin-bottom: 20px;">Zell-Temperatur</div>
+                    <div id="pq-view-temp" style="font-size: 11rem; font-weight: 900; line-height: 1;">--<span class="unit" style="font-size: 6rem; opacity: 0.9; color: #fff;">°C</span></div>
+                </div>
+            </div>
+        </section>
+
         <section id="view-ecoflow" class="view">
             <div class="eco-grid">
                 <div class="eco-data-box">
-                    <i data-lucide="plug-zap" class="large-icon" style="color: #ffcc00; margin-bottom: 20px;"></i>
                     <div class="card-label">Eingang</div>
                     <div id="eco-view-in" class="val-mid">0<span class="unit">W</span></div>
                     <div class="small-label">Solar / AC</div>
                 </div>
                 <div id="eco-circle" class="eco-circle-container">
                     <div id="eco-view-soc" class="eco-circle-value">--<span style="font-size: 4rem;">%</span></div>
-                    <div id="eco-view-remain" class="eco-circle-label">-- Std verbleibend</div>
+                    <div id="eco-view-remain" class="eco-circle-label">-- verbleibend</div>
                 </div>
                 <div class="eco-data-box">
-                    <i data-lucide="power" class="large-icon" style="color: var(--accent-color); margin-bottom: 20px;"></i>
                     <div class="card-label">Ausgang</div>
                     <div id="eco-view-out" class="val-mid">0<span class="unit">W</span></div>
                     <div class="small-label">AC / DC / USB</div>
@@ -374,22 +464,26 @@
                 </div>
                 <div class="detail-card" id="card-vic-solar" style="flex-direction: row;">
                     <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; flex-shrink: 0;">
-                        <div><i data-lucide="sun" class="mid-icon" color="#ffcc00"></i><div class="card-label">Solar</div></div>
+                        <div>
+                            <i data-lucide="sun" class="mid-icon" color="#ffcc00"></i>
+                            <div class="card-label">Solar</div>
+                            <div class="small-label" style="font-size: 2.5rem; opacity: 0.6; margin-top: 85px;">Ladestrom:</div>
+                        </div>
                         <div id="vic-solar-status" class="small-label">Warte auf BLE...</div>
                     </div>
+
                     <div style="display: flex; flex-direction: column; justify-content: center; width: 100%; align-items: flex-end;">
                         <div class="solar-grid">
                             <div id="val-solar-watt" class="val-mid solar-val">--</div><div class="val-mid solar-unit"><span class="unit-large">W</span></div>
                             <div id="val-solar-amp" class="val-mid solar-val">--</div><div class="val-mid solar-unit"><span class="unit-large">A</span></div>
                         </div>
-                        <div class="small-label" style="font-size: 1.2rem; opacity: 0.5; margin-right: 15px; margin-top: 10px;">Lastausgang</div>
                     </div>
                 </div>
                 <div class="detail-card" id="card-vic-booster">
                     <div><i data-lucide="truck" class="mid-icon"></i><div class="card-label">Booster</div></div>
-                    <div id="vic-booster" class="val-mid">--<span class="unit">A</span></div>
+                    <div id="vic-booster" class="val-mid">Offline</div>
                     <div id="vic-booster-status" class="small-label">Warte auf BLE...</div>
-                </div>
+                </div>                
                 <div class="detail-card" id="card-vic-sense">
                     <div>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mid-icon">
@@ -401,27 +495,32 @@
                 </div>
                 <div class="detail-card" id="card-vic-starter">
                     <div><i data-lucide="battery" class="mid-icon"></i><div class="card-label">Starter</div></div>
-                    <div id="vic-starter" class="val-mid">--<span class="unit">V</span></div>
+                    <div id="vic-starter" class="val-mid">--<span class="unit">%</span></div>
                     <div id="vic-starter-status" class="small-label">Warte auf BLE...</div>
                 </div>
             </div>
         </section>
 
         <section id="view-level" class="view">
-            <div class="level-grid">
-                <div class="level-bar-container">
-                    <div class="level-label"><i data-lucide="arrow-left-right" style="margin-right:20px;"></i>Quer (Roll)</div>
-                    <div class="level-value-display" id="disp-roll">0°</div>
-                    <div class="spirit-level"><div class="spirit-center-marker"></div><div class="spirit-center-zone"></div><div id="bubble-roll" class="bubble"></div></div>
-                    <div id="cm-roll" style="margin-top:20px; font-size:3rem; font-weight:700; color:var(--accent-color);">0 cm Korrektur</div>
-                </div>
-                <div class="level-bar-container">
-                    <div class="level-label"><i data-lucide="arrow-up-down" style="margin-right:20px;"></i>Längs (Pitch)</div>
-                    <div class="level-value-display" id="disp-pitch">0°</div>
-                    <div class="spirit-level"><div class="spirit-center-marker"></div><div class="spirit-center-zone"></div><div id="bubble-pitch" class="bubble"></div></div>
-                    <div id="cm-pitch" style="margin-top:20px; font-size:3rem; font-weight:700; color:var(--accent-color);">0 cm Korrektur</div>
+            <div style="position: absolute; top: 60px; left: 100px; z-index: 5;">
+                <h1 style="font-size: 5rem; margin: 0; color: var(--accent-color);">Ausrichtung</h1>
+                <p style="font-size: 2.5rem; opacity: 0.5; margin-top: 10px;">Unterlegkeile in 3cm Schritten</p>
+            </div>
+            
+            <div class="car-level-container">
+                <div class="car-image-wrapper">
+                    <img src="/static/VW_T4_Multivan_Draufsicht.png" alt="T4 Draufsicht">
+                    
+                    <div id="badge-fr" class="wheel-badge xtramp-box" style="top: -5%; left: 23%;">0</div>
+                    
+                    <div id="badge-rr" class="wheel-badge xtramp-box" style="top: -5%; left: 77%;">0</div>
+                    
+                    <div id="badge-fl" class="wheel-badge xtramp-box" style="top: 105%; left: 23%;">0</div>
+                    
+                    <div id="badge-rl" class="wheel-badge xtramp-box" style="top: 105%; left: 77%;">0</div>
                 </div>
             </div>
+            
             <button class="level-cal-btn" onclick="openCalModal()"><i data-lucide="crosshair" style="width:30px; height:30px; vertical-align:middle; margin-right:15px;"></i>Kalibrieren</button>
         </section>
     </div>
@@ -437,13 +536,20 @@
     </div>
     <div id="shutdown-modal" class="modal">
         <div class="modal-content" style="border-color: var(--accent-color); box-shadow: 0 0 100px rgba(0, 212, 255, 0.3);">
-            <h3 style="color: var(--accent-color);">System beenden</h3><p>Möchtest du den Raspberry Pi wirklich<br>herunterfahren?</p>
+            <h3 style="color: var(--accent-color);">System beenden</h3><p>Möchtest du den MultivanPi wirklich<br>herunterfahren?</p>
             <div class="modal-buttons"><button class="btn-modal btn-action" onclick="closeShutdownModal()">Abbrechen</button><button id="btn-shutdown-confirm" class="btn-modal btn-danger" onclick="confirmShutdown()">Herunterfahren</button></div>
         </div>
     </div>
 
     <script>
         let pressureChart = null;
+        let lastData = {};
+
+        // Variablen für den neuen Software-Filter der Lagedaten
+        let smoothedRoll = null;
+        let smoothedPitch = null;
+        const dampingFactor = 0.05;
+
         function safeIconLoad() { if (typeof lucide !== 'undefined' && window.lucide) { window.lucide.createIcons(); } else { setTimeout(safeIconLoad, 100); } }
         function refreshIcons() { if (typeof lucide !== 'undefined' && window.lucide) { window.lucide.createIcons(); } }
         function showView(id) {
@@ -452,6 +558,43 @@
             document.getElementById('btn-home').style.display = (id === 'home') ? 'none' : 'flex';
             refreshIcons();
             if(id === 'press-history') initLargeChart();
+        }
+
+        async function sendFridgeCommand(action, value) {
+            try {
+                await fetch("/api/fridge/control", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, value })
+                });
+            } catch (e) { console.error("Fridge Command Error:", e); }
+        }
+
+        function setFridgeTemp(dir) {
+            const currentSoll = lastData.fridge_target || 5;
+            const newSoll = (dir === 'plus') ? currentSoll + 1 : currentSoll - 1;
+            sendFridgeCommand("temp", newSoll);
+        }
+
+        function toggleFridgeMode() {
+            const currentMode = lastData.fridge_mode || "ECO";
+            const newMode = (currentMode === "ECO") ? "max" : "eco";
+            sendFridgeCommand("mode", newMode);
+        }
+
+        function toggleFridgePower() {
+            const currentPwr = lastData.fridge_power !== undefined ? lastData.fridge_power : true;
+            const newPwr = currentPwr ? "off" : "on";
+            sendFridgeCommand("power", newPwr);
+        }
+
+        function toggleFridgeProtection() {
+            const currentProt = lastData.fridge_protection || "H";
+            let newProt = "H";
+            if (currentProt === "H") newProt = "M";
+            else if (currentProt === "M") newProt = "L";
+            else if (currentProt === "L") newProt = "H";
+            sendFridgeCommand("protection", newProt);
         }
 
         let ecoflowState = { ac: false, dc: false, usb: false };
@@ -469,11 +612,37 @@
         function openCalModal() { document.getElementById('cal-modal').style.display = 'flex'; }
         function closeCalModal() { document.getElementById('cal-modal').style.display = 'none'; }
         async function confirmCalibration() {
-            const btn = document.getElementById('btn-cal-save'); btn.innerHTML = "SPEICHERE...";
-            try { await fetch("http://127.0.0.1:3000/api/level/calibrate", { method: 'POST' });
-                btn.innerHTML = "GESPEICHERT!"; btn.style.background = "var(--success-color)"; btn.style.color = "#000"; btn.style.borderColor = "var(--success-color)";
-                setTimeout(() => { closeCalModal(); setTimeout(() => { btn.innerHTML = "Speichern"; btn.style.background = ""; btn.style.color = ""; btn.style.borderColor = ""; }, 500); }, 1000);
-            } catch(e) { btn.innerHTML = "FEHLER!"; btn.style.background = "var(--danger-color)"; setTimeout(() => { btn.innerHTML = "Speichern"; btn.style.background = ""; btn.style.borderColor = ""; }, 2000); }
+            const btn = document.getElementById('btn-cal-save');
+            btn.innerHTML = "SPEICHERE...";
+            try {
+                const response = await fetch("/api/level/calibrate", { 
+                    method: 'POST',
+                    cache: 'no-cache'
+                });
+        
+                if (response.ok) {
+                    btn.innerHTML = "GESPEICHERT!";
+                    btn.style.background = "var(--success-color)";
+                    btn.style.color = "#000";
+                    
+                    smoothedRoll = null;
+                    smoothedPitch = null;
+
+                    setTimeout(() => { 
+                        closeCalModal(); 
+                        setTimeout(() => {
+                            btn.innerHTML = "Speichern";
+                            btn.style.background = ""; btn.style.color = "";
+                        }, 500);
+                    }, 600);
+                } else {
+                    throw new Error("Server Error");
+                }
+            } catch(e) {
+                btn.innerHTML = "FEHLER!";
+                btn.style.background = "var(--danger-color)";
+                setTimeout(() => { btn.innerHTML = "Speichern"; btn.style.background = ""; }, 2000);
+            }
         }
 
         function openShutdownModal() { document.getElementById('shutdown-modal').style.display = 'flex'; }
@@ -483,11 +652,18 @@
             document.body.style.opacity = "0.3"; document.body.style.pointerEvents = "none";
             fetch("http://127.0.0.1:3000/api/shutdown", { method: 'POST' }).catch(e => console.log("Shutdown request sent"));
         }        
+
         function updateCardStatus(cardId, lastSeenStr) {
             const card = document.getElementById(cardId); if (!card) return;
-            if (lastSeenStr && lastSeenStr !== "Suche...") { card.classList.remove('border-disconnected'); card.classList.add('border-connected');
-            } else { card.classList.remove('border-connected'); card.classList.add('border-disconnected'); }
+            if (lastSeenStr && lastSeenStr !== "Suche...") { 
+                card.classList.remove('border-disconnected'); 
+                card.classList.add('border-connected');
+            } else { 
+                card.classList.remove('border-connected'); 
+                card.classList.add('border-disconnected'); 
+            }
         }
+        
         function getSeconds(timeStr) {
             if (!timeStr || timeStr === "Suche...") return null;
             const parts = timeStr.split(':'); return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(parts[2]);
@@ -498,43 +674,78 @@
                 const res = await fetch("http://127.0.0.1:3000/api/data?t=" + Date.now());
                 if (!res.ok) throw new Error();
                 const data = await res.json();
+                lastData = data; 
 
                 document.getElementById('sys-id').innerText = "Server-ID: " + (data.session || "Verbunden");
                 document.getElementById('sys-pkts').innerText = "Empfangene Pakete: " + (data.sense_packets || 0);
 
-                if (data.level_roll !== undefined) updateLevelUI(data.level_roll, data.level_pitch);
+                if (data.level_roll !== undefined) updateLevelUI(data.level_roll, data.level_pitch, data.veh_wheelbase, data.veh_track);
                 
                 const nowSec = getSeconds(data.server_time);
+                
+                if (data.temp_in !== undefined) document.getElementById('home-temp').innerHTML = data.temp_in.toFixed(1) + '<span class="unit">°C</span>';
+
                 const energyCard = document.getElementById('card-energy');
+
                 if (data.aufbau_soc !== undefined) {
                     document.getElementById('home-soc').innerHTML = data.aufbau_soc.toFixed(1) + '<span class="unit">%</span>';
+                    
                     let isOffline = true;
                     if (data.shunt_aufbau_last !== "Suche..." && nowSec !== null) {
                         const lastSec = getSeconds(data.shunt_aufbau_last);
                         if (lastSec !== null) { let diff = nowSec - lastSec; if (diff < 0) diff += 86400; if (diff <= 120) isOffline = false; }
                     }
-                    if (isOffline) { energyCard.classList.add('warning-border'); document.getElementById('vic-shunt-status').innerText = data.shunt_aufbau_last !== "Suche..." ? "Status: VERBINDUNG VERLOREN (" + data.shunt_aufbau_last + ")" : "Status: Warte auf BLE...";
-                    } else { energyCard.classList.remove('warning-border'); document.getElementById('vic-shunt-status').innerText = "Status: LIVE (" + data.shunt_aufbau_last + ")"; }
+                    
+                    if (isOffline) { 
+                        energyCard.classList.add('warning-border'); 
+                        document.getElementById('vic-shunt-status').innerText = data.shunt_aufbau_last !== "Suche..." ? "Status: VERBINDUNG VERLOREN (" + data.shunt_aufbau_last + ")" : "Status: Warte auf BLE...";
+                    } else { 
+                        energyCard.classList.remove('warning-border'); 
+                        document.getElementById('vic-shunt-status').innerText = "Status: LIVE (" + data.shunt_aufbau_last + ")"; 
+                    }
+                    
+                    const klimaCard = document.getElementById('card-klima');
+                    if (klimaCard && data.auto_off_soc > 0) {
+                        if (!isOffline && data.aufbau_soc <= data.auto_off_soc) {
+                            klimaCard.classList.add('danger-border');
+                        } else {
+                            klimaCard.classList.remove('danger-border');
+                        }
+                    }
                 }
-                
-                if (data.temp_in !== undefined) document.getElementById('home-temp').innerHTML = data.temp_in.toFixed(1) + '<span class="unit">°C</span>';
 
-                // VICTRON
                 if (data.aufbau_soc !== undefined) document.getElementById('vic-soc').innerHTML = data.aufbau_soc.toFixed(1) + '<span class="unit" style="font-size: 6rem;">%</span>';
                 if (data.aufbau_volt !== undefined) document.getElementById('vic-volt-aufbau').innerText = data.aufbau_volt.toFixed(2) + "V";
                 if (data.aufbau_amp !== undefined) document.getElementById('vic-amp-aufbau').innerText = data.aufbau_amp.toFixed(1) + "A";
                 
-                updateCardStatus('card-vic-shunt', data.shunt_aufbau_last); updateCardStatus('card-vic-solar', data.solar_last);
-                updateCardStatus('card-vic-booster', data.booster_last); updateCardStatus('card-vic-sense', data.sense_last); updateCardStatus('card-vic-starter', data.shunt_starter_last);
+                updateCardStatus('card-vic-shunt', data.shunt_aufbau_last); 
+                updateCardStatus('card-vic-solar', data.solar_last);
+                updateCardStatus('card-vic-booster', data.booster_last); 
+                updateCardStatus('card-vic-sense', data.sense_last); 
+                updateCardStatus('card-vic-starter', data.shunt_starter_last);
                 
                 if (data.ecoflow_soc !== undefined) {
                     document.getElementById('eco-view-soc').innerHTML = data.ecoflow_soc.toFixed(1) + '<span style="font-size: 4rem;">%</span>';
-                    document.getElementById('eco-view-in').innerHTML = data.ecoflow_in + '<span class="unit">W</span>';
-                    document.getElementById('eco-view-out').innerHTML = data.ecoflow_out + '<span class="unit">W</span>';
-                    const mins = data.ecoflow_remain;
-                    if (mins > 1440) document.getElementById('eco-view-remain').innerText = "> 24 Std";
-                    else if (mins > 60) document.getElementById('eco-view-remain').innerText = Math.floor(mins/60) + " Std " + Math.floor(mins%60) + " Min";
-                    else document.getElementById('eco-view-remain').innerText = Math.floor(mins) + " Min";
+                    document.getElementById('eco-view-in').innerHTML = (data.ecoflow_in || 0) + '<span class="unit">W</span>';
+                    document.getElementById('eco-view-out').innerHTML = (data.ecoflow_out || 0) + '<span class="unit">W</span>';
+                    
+                    // --- EcoFlow Zeit-Formatierung ---
+                    const mins = data.ecoflow_remain || 0;
+                    const remainEl = document.getElementById('eco-view-remain');
+                    if (mins === 0 || mins > 8000) {
+                        remainEl.innerText = "-- verbleibend";
+                    } else if (mins >= 1440) {
+                        const d = Math.floor(mins / 1440);
+                        const h = Math.floor((mins % 1440) / 60);
+                        remainEl.innerText = String(d).padStart(2, '0') + "d " + String(h).padStart(2, '0') + "h verbleibend";
+                    } else if (mins >= 60) {
+                        const h = Math.floor(mins / 60);
+                        const m = Math.floor(mins % 60);
+                        remainEl.innerText = String(h).padStart(2, '0') + "h " + String(m).padStart(2, '0') + "min verbleibend";
+                    } else {
+                        remainEl.innerText = String(Math.floor(mins)).padStart(2, '0') + " min verbleibend";
+                    }
+
                     const ecoCircle = document.getElementById('eco-circle');
                     if(ecoCircle) { if(data.ecoflow_soc > 20) ecoCircle.classList.remove('low-soc'); else ecoCircle.classList.add('low-soc'); }
                     ecoflowState.ac = data.ecoflow_ac_on; ecoflowState.dc = data.ecoflow_dc_on; ecoflowState.usb = data.ecoflow_usb_on;
@@ -542,28 +753,114 @@
                     const ecoHomeBtn = document.getElementById('btn-ecoflow-home');
                     if (data.ecoflow_connected) ecoHomeBtn.classList.remove('offline'); else ecoHomeBtn.classList.add('offline');
                 }
+                
+                // --- POWERQUEEN UPDATE ---
+                if (data.pq_soc !== undefined) {
+                    const pqSoc = data.pq_soc;
+                    const socText = document.getElementById('pq-view-soc');
+                    if (socText) socText.innerHTML = pqSoc + '<span class="unit" style="font-size: 6rem; opacity: 0.9; color: #fff;">%</span>';
+                    
+                    const waves = document.querySelectorAll('.pq-liquid-wave');
+                    let waveColorLight = 'rgba(68, 255, 68, 0.4)';
+                    let waveColorDark = 'rgba(68, 255, 68, 0.8)';
+                    
+                    if (pqSoc <= 20) {
+                        waveColorLight = 'rgba(255, 68, 68, 0.4)';
+                        waveColorDark = 'rgba(255, 68, 68, 0.8)';
+                    } else if (pqSoc <= 40) {
+                        waveColorLight = 'rgba(255, 204, 0, 0.4)';
+                        waveColorDark = 'rgba(255, 204, 0, 0.8)';
+                    }
+                    
+                    // Top-Kalkulation: 0% = 100% Top (leer), 100% = 0% Top (voll)
+                    const topValue = 100 - pqSoc;
+                    
+                    waves.forEach((w, i) => {
+                        w.style.top = topValue + '%';
+                        w.style.background = (i === 0) ? waveColorLight : waveColorDark;
+                    });
+                }
+                if (data.pq_temp !== undefined) {
+                    const tempText = document.getElementById('pq-view-temp');
+                    if (tempText) tempText.innerHTML = data.pq_temp.toFixed(1) + '<span class="unit" style="font-size: 6rem; opacity: 0.9; color: #fff;">°C</span>';
+                }
 
                 if (data.sense_volt !== undefined) { document.getElementById('vic-sense').innerHTML = data.sense_volt.toFixed(2) + '<span class="unit-large">V</span>'; document.getElementById('vic-sense-status').innerText = "Status: " + (data.sense_packets > 0 ? "LIVE (" + data.sense_last + ")" : "Warte auf BLE..."); }
                 if (data.sense_temp !== undefined) { document.getElementById('clim-batt').innerHTML = parseFloat(data.sense_temp).toFixed(1) + '<span class="unit">°C</span>'; }
-                if (data.solar_watt !== undefined) { document.getElementById('val-solar-watt').innerText = data.solar_watt.toFixed(1); document.getElementById('val-solar-amp').innerText = (data.mppt_load_amp || 0.0).toFixed(1); document.getElementById('vic-solar-status').innerText = "Status: " + (data.solar_last !== "Suche..." ? "LIVE (" + data.solar_last + ")" : "Warte auf BLE..."); }
-                if (data.starter_volt !== undefined) { document.getElementById('vic-starter').innerText = data.starter_volt.toFixed(2) + "V"; document.getElementById('vic-starter-status').innerText = "Status: " + (data.shunt_starter_last !== "Suche..." ? "LIVE (" + data.shunt_starter_last + ")" : "Warte auf BLE..."); }
-                if (data.booster_amp !== undefined) { document.getElementById('vic-booster').innerText = data.booster_amp.toFixed(1) + "A"; document.getElementById('vic-booster-status').innerText = "Status: " + (data.booster_last !== "Suche..." ? "LIVE (" + data.booster_last + ")" : "Warte auf BLE..."); }
-
+                if (data.solar_watt !== undefined) { document.getElementById('val-solar-watt').innerText = data.solar_watt.toFixed(1); document.getElementById('val-solar-amp').innerText = (data.mppt_charge_amp || 0.0).toFixed(1); document.getElementById('vic-solar-status').innerText = "Status: " + (data.solar_last !== "Suche..." ? "LIVE (" + data.solar_last + ")" : "Warte auf BLE..."); }
+                
+                if (data.starter_soc !== undefined && data.starter_soc !== null) { 
+                    document.getElementById('vic-starter').innerHTML = data.starter_soc.toFixed(1) + '<span class="unit">%</span>'; 
+                    document.getElementById('vic-starter-status').innerText = "Status: " + (data.shunt_starter_last !== "Suche..." ? "LIVE (" + data.shunt_starter_last + ")" : "Warte auf BLE..."); 
+                } else if (data.starter_volt !== undefined) { 
+                    document.getElementById('vic-starter').innerHTML = data.starter_volt.toFixed(2) + '<span class="unit">V</span>'; 
+                    document.getElementById('vic-starter-status').innerText = "Status: " + (data.shunt_starter_last !== "Suche..." ? "LIVE (" + data.shunt_starter_last + ")" : "Warte auf BLE..."); 
+                }
+                
+                if (data.booster_amp !== undefined) { 
+                    document.getElementById('vic-booster').innerText = data.booster_amp; 
+                    document.getElementById('vic-booster-status').innerText = "Status: " + (data.booster_last !== "Suche..." ? "LIVE (" + data.booster_last + ")" : "Warte auf BLE...");
+                }
                 if (data.temp_out !== undefined) document.getElementById('clim-out').innerHTML = data.temp_out.toFixed(1) + '<span class="unit">°C</span>';
                 if (data.temp_in !== undefined) document.getElementById('clim-in').innerHTML = data.temp_in.toFixed(1) + '<span class="unit">°C</span>';
                 if (data.humidity !== undefined) document.getElementById('clim-hum').innerHTML = data.humidity.toFixed(1) + '<span class="unit">%</span>';
                 if (data.pressure !== undefined) { document.getElementById('val-pressure').innerText = data.pressure.toFixed(0); updatePressureTrend(data.pressure_trend); }
                 
-                if (data.temp_fridge !== undefined) document.getElementById('clim-fridge').innerHTML = data.temp_fridge.toFixed(1) + '<span class="unit">°C</span>';
+                if (data.temp_fridge !== undefined) { 
+                    const climFridge = document.getElementById('clim-fridge');
+                    if (climFridge) climFridge.innerHTML = data.temp_fridge.toFixed(1) + '<span class="unit">°C</span>'; 
+                    const menuIst = document.getElementById('fridge-menu-ist');
+                    if (menuIst) menuIst.innerHTML = data.temp_fridge.toFixed(1) + '<span class="unit" style="font-size: 4rem;">°C</span>';
+                }
+                if (data.fridge_target !== undefined) {
+                    const menuSoll = document.getElementById('fridge-menu-soll');
+                    if (menuSoll) menuSoll.innerHTML = data.fridge_target + '<span class="unit">°C</span>';
+                }
+                if (data.fridge_voltage !== undefined) {
+                    const menuVolt = document.getElementById('fridge-menu-volt');
+                    if (menuVolt) menuVolt.innerHTML = data.fridge_voltage.toFixed(1) + '<span class="unit">V</span>';
+                }
+                
+                if (data.fridge_protection !== undefined) {
+                    const menuProt = document.getElementById('fridge-menu-prot');
+                    if (menuProt) menuProt.innerHTML = data.fridge_protection;
+                }
+
+                const modeText = document.getElementById('text-fridge-mode');
+                const modeIcon = document.getElementById('icon-fridge-mode');
+                if (modeText && modeIcon) {
+                    if (data.fridge_mode === "MAX") {
+                        modeText.innerText = "MAX Modus";
+                        modeIcon.setAttribute('data-lucide', 'rocket');
+                        modeIcon.style.color = "#e67e22";
+                    } else {
+                        modeText.innerText = "ECO Modus";
+                        modeIcon.setAttribute('data-lucide', 'leaf');
+                        modeIcon.style.color = "#44ff44";
+                    }
+                }
+
+                const pwrText = document.getElementById('text-fridge-power');
+                const pwrIcon = document.getElementById('icon-fridge-power');
+                if (pwrText && pwrIcon && data.fridge_power !== undefined) {
+                    if (data.fridge_power) {
+                        pwrText.innerText = "Power ON";
+                        pwrIcon.style.color = "var(--success-color)";
+                    } else {
+                        pwrText.innerText = "Power OFF";
+                        pwrIcon.style.color = "var(--danger-color)";
+                    }
+                }
+
+                refreshIcons();
+
                 if (data.pressure_history && document.getElementById('view-press-history').classList.contains('active')) { updateLargeChart(data.pressure_history); }
 
-                // SYSTEM & INFO
                 if (data.sys_cpu_temp) document.getElementById('info-cpu').innerText = data.sys_cpu_temp;
                 if (data.sys_rtc_temp !== undefined) document.getElementById('info-rtc').innerText = data.sys_rtc_temp; 
                 if (data.sys_python) document.getElementById('info-python').innerText = data.sys_python;
                 if (data.session) document.getElementById('info-session').innerText = data.session;
                 
-                // WLAN UPDATE (HIER NEU)
                 if (data.sys_ssid) {
                     document.getElementById('info-wifi').innerText = data.sys_ssid;
                     document.getElementById('info-wifi').className = "info-split-val wifi-ok";
@@ -610,23 +907,45 @@
             largePressChart.update('none');
         }
 
-        function updateLevelUI(roll, pitch) {
-            const bRoll = document.getElementById('bubble-roll');
-            let rawCmRoll = Math.sin(roll * (Math.PI/180)) * 156;
-            let cmRoll = Math.round(rawCmRoll / 3) * 3;
-            let moveRoll = (rawCmRoll / 20) * 800; 
-            if (moveRoll > 800) moveRoll = 800; if (moveRoll < -800) moveRoll = -800;
-            bRoll.style.transform = `translateX(calc(-50% + ${moveRoll}px))`;
-            document.getElementById('disp-roll').innerText = Math.abs(roll).toFixed(1) + "°";
-            document.getElementById('cm-roll').innerText = (cmRoll > 0 ? "Rechts " : "Links ") + Math.abs(cmRoll).toFixed(0) + " cm unterlegen";
-            const bPitch = document.getElementById('bubble-pitch');
-            let rawCmPitch = Math.sin(pitch * (Math.PI/180)) * 292;
-            let cmPitch = Math.round(rawCmPitch / 3) * 3;
-            let movePitch = (rawCmPitch / 20) * 800;
-            if (movePitch > 800) movePitch = 800; if (movePitch < -800) movePitch = -800;
-            bPitch.style.transform = `translateX(calc(-50% + ${movePitch}px))`;
-            document.getElementById('disp-pitch').innerText = Math.abs(pitch).toFixed(1) + "°";
-            document.getElementById('cm-pitch').innerText = (cmPitch > 0 ? "Hinten " : "Vorne ") + Math.abs(cmPitch).toFixed(0) + " cm unterlegen";
+        function updateLevelUI(roll, pitch, wheelbase, track) {
+            let trackCm = (track || 1560) / 10;
+            let wbCm = (wheelbase || 2920) / 10;
+            
+            if (smoothedRoll === null) smoothedRoll = roll;
+            if (smoothedPitch === null) smoothedPitch = pitch;
+            
+            smoothedRoll = (roll * dampingFactor) + (smoothedRoll * (1 - dampingFactor));
+            smoothedPitch = (pitch * dampingFactor) + (smoothedPitch * (1 - dampingFactor));
+            
+            let rawCmRoll = Math.sin(smoothedRoll * (Math.PI/180)) * trackCm;
+            let rawCmPitch = Math.sin(smoothedPitch * (Math.PI/180)) * wbCm;
+            
+            let zFL = (+rawCmRoll / 2) + (+rawCmPitch / 2);
+            let zFR = (-rawCmRoll / 2) + (+rawCmPitch / 2);
+            let zRL = (+rawCmRoll / 2) + (-rawCmPitch / 2);
+            let zRR = (-rawCmRoll / 2) + (-rawCmPitch / 2);
+            
+            let maxZ = Math.max(zFL, zFR, zRL, zRR);
+            
+            let wheelVals = {
+                'fl': Math.round((maxZ - zFL) / 3) * 3,
+                'fr': Math.round((maxZ - zFR) / 3) * 3,
+                'rl': Math.round((maxZ - zRL) / 3) * 3,
+                'rr': Math.round((maxZ - zRR) / 3) * 3
+            };
+            
+            ['fl', 'fr', 'rl', 'rr'].forEach(wheel => {
+                let el = document.getElementById('badge-' + wheel);
+                let val = wheelVals[wheel];
+                
+                el.innerText = val; 
+                
+                if (val <= 6) {
+                    el.classList.add('zero-lift');
+                } else {
+                    el.classList.remove('zero-lift');
+                }
+            });
         }
 
         function updateClock() {
@@ -635,9 +954,44 @@
             document.getElementById('date').textContent = now.toLocaleDateString('de-DE', {weekday: 'long', day: 'numeric', month: 'long'});
         }
 
+        let idleTime = 0;
+        let isScreenOff = false;
+        const IDLE_TIMEOUT = 900; 
+        const wakeShield = document.getElementById('wake-shield');
+
+        setInterval(() => {
+            idleTime++;
+            if (idleTime === IDLE_TIMEOUT && !isScreenOff) {
+                isScreenOff = true;
+                wakeShield.style.display = 'block'; 
+                fetch("/api/display/off", { method: 'POST' }).catch(e => console.log(e));
+            }
+        }, 1000);
+
+        ['pointerdown', 'touchstart', 'click'].forEach(evt => {
+            wakeShield.addEventListener(evt, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (isScreenOff) {
+                    isScreenOff = false;
+                    idleTime = 0;
+                    fetch("/api/display/on", { method: 'POST' }).catch(e => console.log(e));
+                    
+                    setTimeout(() => {
+                        wakeShield.style.display = 'none';
+                    }, 500);
+                }
+            }, { capture: true });
+        });
+
+        document.addEventListener('pointerdown', () => {
+            if (!isScreenOff) idleTime = 0;
+        });
+
         window.onload = safeIconLoad;
         setInterval(updateClock, 1000); 
-        setInterval(fetchData, 500);
+        setInterval(fetchData, 1000);
         updateClock(); fetchData(); 
     </script>
 </body>

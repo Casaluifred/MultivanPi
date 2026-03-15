@@ -8,6 +8,7 @@ __pycache__/
 backend/config.json
 backend/calibration.json
 backend/pressure_history.json
+backups/
 
 # Logs
 service.log
