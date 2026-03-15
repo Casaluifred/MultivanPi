@@ -1,4 +1,4 @@
-# MultivanPi v2.4
+# MultivanPi v4.8
 
 Zentrales Dashboard für den VW Multivan zur Überwachung von Victron Energiedaten, Klima und Fahrzeug-Nivellierung.
 
